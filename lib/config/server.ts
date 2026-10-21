@@ -1,5 +1,4 @@
 import "server-only";
-import dotenv from "dotenv";
 import { z } from "zod";
 import { clientSchema } from "./client";
 
@@ -10,8 +9,6 @@ const envFile =
     : process.env.NODE_ENV === "development"
       ? ".env.development"
       : ".env";
-
-dotenv.config({ path: envFile });
 
 // Define the server schema for environment variables
 const serverSchema = z.object({
@@ -25,7 +22,7 @@ const serverSchema = z.object({
     ),
 
   // Runtime config
-  NODE_ENV: z.enum(["development", "staging", "production", "test"]),
+  NODE_ENV: z.enum(["development", "production", "test"]),
   APP_URL: z
     .string()
     .url()
