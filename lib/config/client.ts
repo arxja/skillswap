@@ -1,14 +1,38 @@
 import { z } from "zod";
 
+const normalizeEmptyString = (value: unknown) =>
+  typeof value === "string" && value.trim() === "" ? undefined : value;
+
+const isAbsoluteUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return url.protocol.length > 0;
+  } catch {
+    return false;
+  }
+};
+
 // Client-safe schema (safe to import in Client Components)
 export const clientSchema = z.object({
-  NEXT_PUBLIC_APP_NAME: z.string().default("My App"),
-  NEXT_PUBLIC_API_URL: z.string().url().default("/api"),
+  NEXT_PUBLIC_APP_NAME: z.preprocess(
+    normalizeEmptyString,
+    z.string().default("My App"),
+  ),
+  NEXT_PUBLIC_API_URL: z.preprocess(
+    normalizeEmptyString,
+    z
+      .string()
+      .default("/api")
+      .refine((value) => value.startsWith("/") || isAbsoluteUrl(value), {
+        message:
+          "NEXT_PUBLIC_API_URL must be a path beginning with '/' or a valid absolute URL",
+      }),
+  ),
 });
 
 const rawClientEnv = {
-  NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_APP_NAME: normalizeEmptyString(process.env.NEXT_PUBLIC_APP_NAME),
+  NEXT_PUBLIC_API_URL: normalizeEmptyString(process.env.NEXT_PUBLIC_API_URL),
 };
 
 function validateClientConfig() {

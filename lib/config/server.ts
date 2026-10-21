@@ -2,14 +2,6 @@ import "server-only";
 import { z } from "zod";
 import { clientSchema } from "./client";
 
-// Load environment files based on NODE_ENV
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? ".env.production"
-    : process.env.NODE_ENV === "development"
-      ? ".env.development"
-      : ".env";
-
 // Define the server schema for environment variables
 const serverSchema = z.object({
   // Server-only
@@ -36,21 +28,6 @@ function validateServerConfig() {
   try {
     const serverConfig = serverSchema.parse(process.env);
     const clientConfig = clientSchema.parse(process.env);
-
-    // Security: Log missing critical vars in production
-    if (process.env.NODE_ENV === "production") {
-      const missingRequired = Object.entries(serverSchema.shape)
-        .filter(([key, schema]) => !schema.isOptional() && !process.env[key])
-        .map(([key]) => key);
-
-      if (missingRequired.length > 0) {
-        console.error(
-          "❌ Missing required environment variables:",
-          missingRequired,
-        );
-        process.exit(1);
-      }
-    }
 
     // server + client
     return { ...serverConfig, ...clientConfig };

@@ -27,6 +27,9 @@ export const logger = pino({
     "password",
     "secret",
     "token",
+    "details.password",
+    "details.secret",
+    "details.token",
     "req.headers.authorization",
     "req.headers.cookie",
     "body.password",
@@ -70,18 +73,21 @@ export function getLogger() {
 
 // Convenience methods
 export const log = {
-  info: (msg: string, data?: any) => getLogger().info(data, msg),
-  error: (msg: string, error?: Error, data?: any) =>
+  info: (msg: string, data?: Record<string, unknown>) =>
+    getLogger().info(data, msg),
+  error: (msg: string, error?: Error, data?: Record<string, unknown>) =>
     getLogger().error({ err: error, ...data }, msg),
-  warn: (msg: string, data?: any) => getLogger().warn(data, msg),
-  debug: (msg: string, data?: any) => getLogger().debug(data, msg),
-  perf: (msg: string, durationMs: number, data?: any) => {
+  warn: (msg: string, data?: Record<string, unknown>) =>
+    getLogger().warn(data, msg),
+  debug: (msg: string, data?: Record<string, unknown>) =>
+    getLogger().debug(data, msg),
+  perf: (msg: string, durationMs: number, data?: Record<string, unknown>) => {
     getLogger().info({ type: "performance", durationMs, ...data }, msg);
   },
-  request: (msg: string, data?: any) => {
+  request: (msg: string, data?: Record<string, unknown>) => {
     getLogger().info({ type: "request", ...data }, msg);
   },
-  security: (msg: string, data?: any) => {
+  security: (msg: string, data?: Record<string, unknown>) => {
     getLogger().warn({ type: "security", ...data }, msg);
   },
 };

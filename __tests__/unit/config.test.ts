@@ -4,13 +4,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 // Neutralize it so we can import server.ts in the test runner.
 vi.mock("server-only", () => ({}));
 
-// `server.ts` calls dotenv.config({ path: envFile }) at module load.
-// Without this mock, dotenv would read real .env files from the cwd
-// and pollute process.env between tests. We want full control.
-vi.mock("dotenv", () => ({
-  default: { config: vi.fn() },
-}));
-
 // Capture the runner's original env
 const ORIGINAL_ENV = process.env;
 
@@ -20,6 +13,7 @@ const MANAGED_KEYS = [
   "DATABASE_URL",
   "APP_URL",
   "LOG_LEVEL",
+  "NODE_ENV",
   "NEXT_PUBLIC_APP_NAME",
   "NEXT_PUBLIC_API_URL",
 ] as const;
@@ -30,9 +24,8 @@ function resetEnv() {
 }
 
 // Fills every required server-side var with a valid value.
-// ⚠️ NODE_ENV must be in the schema's enum — "test" is NOT in
-// ["development", "staging", "production"], so we use "development"
-// here. See the note at the bottom about adding "test" to the enum.
+// ⚠️ NODE_ENV must be in the schema's enum — ["development", "production", "test"]
+// so we use "development" here for the valid default case.
 function setValidServerEnv(overrides: Record<string, string> = {}) {
   Object.assign(process.env, {
     DATABASE_URL: "postgresql://localhost/test",
@@ -83,6 +76,15 @@ describe("client config", () => {
     const { config } = await importClient();
     expect(config.NEXT_PUBLIC_APP_NAME).toBe("Test App");
     expect(config.NEXT_PUBLIC_API_URL).toBe("https://api.example.com");
+  });
+
+  it("treats empty-string env values as unset", async () => {
+    process.env.NEXT_PUBLIC_APP_NAME = "";
+    process.env.NEXT_PUBLIC_API_URL = "";
+
+    const { config } = await importClient();
+    expect(config.NEXT_PUBLIC_APP_NAME).toBe("My App");
+    expect(config.NEXT_PUBLIC_API_URL).toBe("/api");
   });
 
   it("throws on invalid NEXT_PUBLIC_API_URL", async () => {
