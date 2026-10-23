@@ -22,6 +22,7 @@ const serverSchema = z.object({
       message: "APP_URL must use http or https",
     }),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]),
+  DEMO_READ_ONLY: z.coerce.boolean().default(false),
 });
 
 function validateServerConfig() {
