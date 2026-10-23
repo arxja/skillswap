@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #faf9f6;
+  --color-foreground: #141311;
+  --color-accent: #a33b20;
+  --color-border: #e7e5e4;
+  --color-ring: #a33b20;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
