@@ -141,3 +141,9 @@ see that reciprocity is enforced, not just suggested.
 **Why:** Hydration costs CPU and memory per document and provides getters,
 virtuals, and dirty-tracking that read-only paths don't use. The matching
 query scans every candidate, so the cost is per-user, not per-request.
+
+## D-015: Design tokens for v1.
+
+**Decided:** Font: `Inter`. Palette: bg `#faf9f6`, fg `#141311`, accent `#a33b20`. Light mode only.
+**Why:** Lack of proper visual foundation for upcoming features 
+
