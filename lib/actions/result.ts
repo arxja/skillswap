@@ -47,7 +47,10 @@ export async function runAction<T>(
       logError(err);
       return {
         ok: false,
-        error: { code: err.errorCode, message: err.message },
+        error: {
+          code: err.errorCode,
+          message: err.isOperational ? err.message : "Something went wrong",
+        },
       };
     }
 
@@ -59,8 +62,3 @@ export async function runAction<T>(
     };
   }
 }
-
-await runAction(async () => 42); // { ok: true, data: 42 }
-await runAction(async () => {
-  throw AppError.notFound();
-}); // { ok: false, error: { code: "NOT_FOUND" } }
