@@ -6,7 +6,7 @@ A skill-exchange platform: users list skills they teach and skills they want
 to learn; the app surfaces reciprocal matches and tracks a swap from request
 to completion.
 
-**Stack:** TypeScript · Next.js (App Router) · MongoDB + Mongoose · Zod · Clerk · Vercel
+**Stack:** TypeScript · Next.js (App Router) · MongoDB + Mongoose · Zod · Clerk · Pnpm (package manager) · Vercel
 **Architecture:** Full-stack Nextjs (APIs + Server actions) — see `docs/architecture.md`
 
 ## Rules that apply everywhere
