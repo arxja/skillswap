@@ -18,6 +18,12 @@ describe("buildPairKey", () => {
     );
   });
 
+  it("keeps each user attached to its own skill when ordering offers", () => {
+    expect(buildPairKey("bob", "alice", "java", "python")).toBe(
+      "alice:bob:python:java",
+    );
+  });
+
   // ───────────────────────────────────────────────────────────────────────────
   // Input → output contract. Covers canonical ordering, already-sorted inputs,
   // and degenerate values. Every row asserts the exact string that gets stored

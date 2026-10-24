@@ -8,7 +8,7 @@ import "server-only";
  * React, so the partial unique index on Swap.pairKey can prevent
  * duplicate active swaps regardless of who initiated.
  *
- * Achieves this by sorting both pairs before joining.
+x` * Achieves this by sorting each user/skill offer as a unit before joining.
  */
 export function buildPairKey(
   userA: string,
@@ -16,7 +16,14 @@ export function buildPairKey(
   skillA: string,
   skillB: string,
 ): string {
-  const [userLow, userHigh] = [userA, userB].sort();
-  const [skillLow, skillHigh] = [skillA, skillB].sort();
+  const [[userLow, skillLow], [userHigh, skillHigh]] = [
+    [userA, skillA],
+    [userB, skillB],
+  ].sort(([userLeft, skillLeft], [userRight, skillRight]) => {
+    return (
+      userLeft.localeCompare(userRight) || skillLeft.localeCompare(skillRight)
+    );
+  });
+
   return `${userLow}:${userHigh}:${skillLow}:${skillHigh}`;
 }
