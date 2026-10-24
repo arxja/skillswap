@@ -1,8 +1,31 @@
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
-  test: { environment: "node" },
-  
+  resolve: { tsconfigPaths: true },
+  test: {
+    projects: [
+      {
+        test: {
+          name: "unit",
+          include: ["__tests__/unit/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
+        test: {
+          name: "integration",
+          include: ["__tests__/integration/**/*.test.ts"],
+          environment: "node",
+          setupFiles: ["dotenv/config"],
+        },
+      },
+      {
+        test: {
+          name: "components",
+          include: ["__tests__/components/**/*.test.ts"],
+          environment: "jsdom",
+        },
+      },
+    ],
+  },
 });
