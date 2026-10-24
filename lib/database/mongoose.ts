@@ -28,8 +28,14 @@ if (!MONGODB_URI) {
 }
 
 export async function connectDB(): Promise<mongoose.Connection> {
-  if (cached.conn) {
-    return cached.conn;
+  const conn = cached.conn;
+  if (conn?.readyState === 1) {
+    return conn;
+  }
+
+  if (conn) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
   if (!cached.promise) {
