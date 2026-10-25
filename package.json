@@ -17,6 +17,7 @@
     "seed:demo": "node --conditions=react-server --env-file=.env --import tsx scripts/seed.ts --profile=demo"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.20",
     "mongoose": "^9.11.3",
     "next": "16.4.2",
     "pino": "^10.4.0",
