@@ -61,3 +61,10 @@ export async function connectDB(): Promise<mongoose.Connection> {
 
   return cached.conn;
 }
+
+export async function disconnectDB(): Promise<void> {
+  await mongoose.disconnect();
+  cached.conn = null;
+  cached.promise = null;
+  global.mongooseCache = cached;
+}
