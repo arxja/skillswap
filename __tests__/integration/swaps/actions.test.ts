@@ -51,7 +51,9 @@ function expectErr<T>(
 }
 
 const makeAuthMock = (clerkId: string) => {
-  vi.mocked(auth).mockResolvedValue({ userId: clerkId } as any);
+  vi.mocked(auth).mockResolvedValue({ userId: clerkId } as unknown as Awaited<
+    ReturnType<typeof auth>
+  >);
 };
 
 async function makeSwap(
