@@ -17,6 +17,7 @@ export default defineConfig({
           include: ["__tests__/integration/**/*.test.ts"],
           environment: "node",
           setupFiles: ["dotenv/config"],
+          fileParallelism: false,
         },
       },
       {
