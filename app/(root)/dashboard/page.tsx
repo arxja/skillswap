@@ -3,7 +3,8 @@ import { MatchCard } from "@/components/swaps/match-card";
 import { SwapCard } from "@/components/swaps/swap-card";
 import { findMatches } from "@/services/matching/find-matches";
 import { listMySwaps } from "@/services/swaps/list-my-swaps";
-import { requireCurrentUser } from "@/services/users/get-current-user";
+import { getCurrentUser } from "@/services/users/get-current-user";
+import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
   return (
@@ -16,13 +17,19 @@ export default function DashboardPage() {
 }
 
 async function DashboardContent() {
-  const user = await requireCurrentUser();
+  // Redirect to sign-in if the user is not authenticated before loading the dashboard content.
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
   const [matches, swaps] = await Promise.all([
     findMatches(String(user._id)),
     listMySwaps(String(user._id)),
   ]);
 
-  const activeOtherIds = new Set(swaps.active.map((swap) => swap.otherUserId));
+  const activeOtherIds = new Set(
+    [...swaps.incoming, ...swaps.outgoing, ...swaps.active].map(
+      (swap) => swap.otherUserId,
+    ),
+  );
   const freshMatches = matches.filter(
     (match) => !activeOtherIds.has(match.userId),
   );
