@@ -75,8 +75,12 @@ export function SwapActionButtons({
                 : "rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 disabled:cursor-not-allowed disabled:opacity-60"
             }
             onClick={() => {
-              startTransition(() => {
-                void run(button.action);
+              startTransition(async () => {
+                try {
+                  await run(button.action);
+                } catch {
+                  setError("Something went wrong");
+                }
               });
             }}
           >
