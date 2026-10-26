@@ -55,8 +55,9 @@ export async function listMySwaps(userId: string): Promise<MySwaps> {
     }
   }
 
+  type LeanSwap = (typeof incoming)[number];
   const mapSwap = (
-    swap: any,
+    swap: LeanSwap,
     myRole: "requester" | "recipient",
   ): SwapSummary => {
     const otherUserId =
