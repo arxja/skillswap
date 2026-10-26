@@ -30,9 +30,11 @@ async function SwapDetailContent({
   const detailDirection =
     detail.swap.status === "accepted"
       ? "active"
-      : detail.myRole === "requester"
-        ? "outgoing"
-        : "incoming";
+      : detail.swap.status === "pending"
+        ? detail.myRole === "requester"
+          ? "outgoing"
+          : "incoming"
+        : null;
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-8">
@@ -85,12 +87,14 @@ async function SwapDetailContent({
         </div>
       </div>
 
-      <div className="mt-6">
-        <SwapActionButtons
-          swapId={detail.swap._id}
-          direction={detailDirection}
-        />
-      </div>
+      {detailDirection ? (
+        <div className="mt-6">
+          <SwapActionButtons
+            swapId={detail.swap._id}
+            direction={detailDirection}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-8 rounded-lg border border-dashed border-stone-300 bg-stone-50 p-6 text-sm text-stone-600">
         Messages will appear here (coming in Unit 6)
