@@ -145,5 +145,48 @@ query scans every candidate, so the cost is per-user, not per-request.
 ## D-015: Design tokens for v1.
 
 **Decided:** Font: `Inter`. Palette: bg `#faf9f6`, fg `#141311`, accent `#a33b20`. Light mode only.
-**Why:** Lack of proper visual foundation for upcoming features 
+**Why:** Lack of proper visual foundation for upcoming features
 
+## D-016: Lazy JIT user provisioning instead of Clerk webhook
+
+**Decided:** On first authenticated request, upsert the Mongo User by clerkId.
+**Considered:** Clerk webhook (user.created), middleware sync.
+**Why:** Webhooks introduce infrastructure and eventual consistency; Clerk's
+own guidance notes syncing is not always necessary. The upsert is
+race-safe because clerkId is unique and duplicate-key errors are retried.
+A webhook can be added later for user.updated/deleted sync.
+
+## D-017: Resource-based auth checks, not middleware route matchers
+
+**Decided:** Protect pages and Server Actions individually via
+getCurrentUser/requireCurrentUser.
+**Considered:** createRouteMatcher in middleware.
+**Why:** Clerk has deprecated createRouteMatcher() and recommends checking
+auth as close to the resource as possible. Middleware cannot reliably
+protect Server Actions, which are called by ID, not by path.
+
+## D-018: Two resolvers — getCurrentUser (null) + requireCurrentUser (throw)
+
+**Decided:** getCurrentUser returns null for signed-out; requireCurrentUser
+throws AppError.unauthorized().
+**Considered:** one function with a flag, or only one behavior.
+**Why:** Pages need a signed-out UX (redirect), so null is appropriate.
+Server Actions must fail closed, so requireCurrentUser throws and runAction
+translates the error. The function name makes the contract explicit.
+
+## D-019: Integration tests use the real dev DB with `test_` prefix
+
+**Decided:** Vitest integration tests connect to config.DATABASE*URL,
+seed with prefix-scoped clerkIds, and clean up with
+deleteMany({ clerkId: { $regex: /^test*/ } }).
+**Considered:** mongodb-memory-server for isolation.
+**Why:** Real DB exercises the production connection path (driver,
+connection string, bufferCommands:false). One fewer dependency.
+Isolation comes from prefix-scoped cleanup, not from an ephemeral DB.
+RULE: never deleteMany({}) in a test's afterAll on this DB.
+
+## D-020: Two demo accounts with account switching
+
+**Decided:** Supersedes part of D-013 ("one demo account"). Demo seeds `demo_you` and `demo_ana` — the two sides of the same swap. The demo entry offers "Explore as You" / "Explore as Ana", each auto-signing into that Clerk user. Read-only mode (D-013) is unchanged — both accounts are view-only.
+**Considered:** let viewer interact with app like prod, keep the single user demo
+**Why:** reciprocity is the product's core idea, and a one-sided view hides it.

@@ -28,11 +28,18 @@ export const clientSchema = z.object({
           "NEXT_PUBLIC_API_URL must be a path beginning with '/' or a valid absolute URL",
       }),
   ),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.preprocess(
+    normalizeEmptyString,
+    z.string().optional(),
+  ),
 });
 
 const rawClientEnv = {
   NEXT_PUBLIC_APP_NAME: normalizeEmptyString(process.env.NEXT_PUBLIC_APP_NAME),
   NEXT_PUBLIC_API_URL: normalizeEmptyString(process.env.NEXT_PUBLIC_API_URL),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: normalizeEmptyString(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  ),
 };
 
 function validateClientConfig() {

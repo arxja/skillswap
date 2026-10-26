@@ -23,6 +23,7 @@ const serverSchema = z.object({
     }),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]),
   DEMO_READ_ONLY: z.stringbool().default(false),
+  CLERK_SECRET_KEY: z.string().optional(),
 });
 
 function validateServerConfig() {
