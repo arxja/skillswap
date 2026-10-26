@@ -4,9 +4,14 @@ import { AppError } from "@/lib/errors";
 import { SwapModel } from "@/lib/database/models/swap.model";
 import { UserModel } from "@/lib/database/models/user.model";
 import { connectDB } from "@/lib/database/mongoose";
+import { isValidObjectId } from "mongoose";
 
 export async function getSwapById(swapId: string, viewerId: string) {
   await connectDB();
+
+  if (!isValidObjectId(swapId)) {
+    throw AppError.badRequest("Invalid swap ID");
+  }
 
   const swap = await SwapModel.findById(swapId).lean();
   if (!swap) {

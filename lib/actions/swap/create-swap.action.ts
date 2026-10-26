@@ -7,6 +7,8 @@ import { SwapModel } from "@/lib/database/models/swap.model";
 import { requireCurrentUser } from "@/services/users/get-current-user";
 import { buildPairKey } from "@/services/swaps/pair-key";
 import { CreateSwapInput } from "@/lib/validation/swap.schema";
+import { isValidObjectId } from "mongoose";
+import { UserModel } from "@/lib/database/models/user.model";
 
 export async function createSwap(
   input: unknown,
@@ -15,8 +17,16 @@ export async function createSwap(
     const data = CreateSwapInput.parse(input);
     const me = await requireCurrentUser();
 
+    if (!isValidObjectId(data.recipientId)) {
+      throw AppError.badRequest("Invalid recipient");
+    }
+
     if (String(me._id) === data.recipientId) {
       throw AppError.badRequest("You cannot swap with yourself");
+    }
+
+    if (!(await UserModel.exists({ _id: data.recipientId }))) {
+      throw AppError.notFound("Recipient");
     }
 
     const pairKey = buildPairKey(

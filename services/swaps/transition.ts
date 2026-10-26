@@ -3,6 +3,7 @@ import { SwapModel } from "@/lib/database/models/swap.model";
 import { connectDB } from "@/lib/database/mongoose";
 import { AppError } from "@/lib/errors";
 import { canTransition, type SwapAction, type Actor } from "./state-machine";
+import { isValidObjectId } from "mongoose";
 
 export async function transition(
   swapId: string,
@@ -11,6 +12,9 @@ export async function transition(
 ) {
   await connectDB();
 
+  if (!isValidObjectId(swapId)) {
+    throw AppError.notFound("Swap");
+  }
   const swap = await SwapModel.findById(swapId).lean();
   if (!swap) {
     throw AppError.notFound("Swap");
