@@ -69,6 +69,12 @@ export async function listMySwaps(userId: string): Promise<MySwaps> {
     const theirOfferedSkillId =
       myRole === "requester" ? swap.recipientSkillId : swap.requesterSkillId;
 
+    const createdAt = new Date(
+      ((swap as { createdAt?: Date | string }).createdAt ?? Date.now()) as
+        | Date
+        | string,
+    );
+
     return {
       _id: String(swap._id),
       status: swap.status,
@@ -77,7 +83,7 @@ export async function listMySwaps(userId: string): Promise<MySwaps> {
       otherUserDisplayName: userMap.get(otherUserId) ?? "Unknown user",
       myOfferedSkillId,
       theirOfferedSkillId,
-      createdAt: swap.createdAt,
+      createdAt,
     };
   };
 
