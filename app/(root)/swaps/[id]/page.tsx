@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
+
+import { MessageThread } from "@/components/swaps/message-thread";
 import { SwapActionButtons } from "@/components/swaps/swap-action-buttons";
+import { listMessages } from "@/services/messages/list-messages";
 import { getSwapById } from "@/services/swaps/get-swap-by-id";
 import { requireCurrentUser } from "@/services/users/get-current-user";
 
@@ -96,10 +99,23 @@ async function SwapDetailContent({
         </div>
       ) : null}
 
-      <div className="mt-8 rounded-lg border border-dashed border-stone-300 bg-stone-50 p-6 text-sm text-stone-600">
-        Messages will appear here (coming in Unit 6)
-      </div>
+      <Suspense fallback={<ThreadSkeleton />}>
+        <MessagesSection swapId={id} />
+      </Suspense>
     </main>
+  );
+}
+
+async function MessagesSection({ swapId }: { swapId: string }) {
+  const user = await requireCurrentUser();
+  const initial = await listMessages(swapId, user.clerkId);
+
+  return (
+    <MessageThread
+      swapId={swapId}
+      initialMessages={initial}
+      currentUserId={String(user._id)}
+    />
   );
 }
 
@@ -110,5 +126,17 @@ function SwapDetailSkeleton() {
       <div className="mt-6 h-12 animate-pulse rounded bg-stone-200" />
       <div className="mt-4 h-40 animate-pulse rounded-lg bg-stone-200" />
     </main>
+  );
+}
+
+function ThreadSkeleton() {
+  return (
+    <div className="mt-8 rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+      <div className="h-5 w-28 animate-pulse rounded bg-stone-200" />
+      <div className="mt-4 space-y-3">
+        <div className="h-16 animate-pulse rounded-lg bg-stone-200" />
+        <div className="h-16 animate-pulse rounded-lg bg-stone-200" />
+      </div>
+    </div>
   );
 }
